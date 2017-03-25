@@ -8,8 +8,15 @@
     android:fitsSystemWindows="true"
     tools:openDrawer="start">
 
+<!--    <FrameLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </FrameLayout>-->
     <include
-        layout="@layout/app_bar_chat_rooms"
+        android:id="@+id/fragment_container"
+        layout="@layout/fragment_empty"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
