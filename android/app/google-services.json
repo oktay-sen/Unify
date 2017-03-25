@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "42724741797",
+    "firebase_url": "https://unify-cadcb.firebaseio.com",
+    "project_id": "unify-cadcb",
+    "storage_bucket": "unify-cadcb.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:42724741797:android:c2864eab01bbc38b",
+        "android_client_info": {
+          "package_name": "com.gmail.senokt16.unify"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "42724741797-np17vgpqut4650i653fnut2sh6rmqumi.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.gmail.senokt16.unify",
+            "certificate_hash": "e0b62f9d5286ed0868b875bcc6479807a94de09d"
+          }
+        },
+        {
+          "client_id": "42724741797-6domhmup786jshhuhvnvcqo26b159cm7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAYFLQC2wM0imYuv9cR-9bp5q77HjJ8rCk"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "42724741797-6domhmup786jshhuhvnvcqo26b159cm7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
