@@ -1,9 +1,11 @@
 package com.gmail.senokt16.unify;
 
 import android.app.Activity;
+import android.net.Uri;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +23,7 @@ import com.makeramen.roundedimageview.RoundedImageView;
 
 public class ChatViewHolder extends RecyclerView.ViewHolder {
     TextView sender, text;
-    RoundedImageView image;
+    RoundedImageView image, profile;
     CardView container;
     public ChatViewHolder(View itemView) {
         super(itemView);
@@ -29,6 +31,7 @@ public class ChatViewHolder extends RecyclerView.ViewHolder {
         text = (TextView) itemView.findViewById(R.id.chat_message);
         image = (RoundedImageView) itemView.findViewById(R.id.chat_image);
         container = (CardView) itemView.findViewById(R.id.chat_container);
+        profile = (RoundedImageView) itemView.findViewById(R.id.chat_profile);
     }
 
     public void populateViewHolder(Chat chat, int position, Activity activity) {
@@ -39,18 +42,32 @@ public class ChatViewHolder extends RecyclerView.ViewHolder {
             layoutParams.gravity = Gravity.END;
             container.setLayoutParams(layoutParams);
             sender.setVisibility(View.GONE);
+            profile.setVisibility(View.GONE);
         } else {
             sender.setText(chat.name);
+            if (chat.photoUrl != null && chat.photoUrl.length() > 0) {
+                Glide.with(activity)
+                        .fromUri()
+                        .asBitmap()
+                        .load(Uri.parse(chat.photoUrl))
+                        .into(profile);
+            }
         }
         if (chat.imageUrl == null || chat.imageUrl.length() == 0) {
             image.setVisibility(View.GONE);
         } else {
-            StorageReference ref = FirebaseStorage.getInstance().getReferenceFromUrl(chat.imageUrl);
-            Glide.with(activity)
-                    .using(new FirebaseImageLoader())
-                    .load(ref)
-                    .asBitmap()
-                    .into(image);
+            Log.d("StorageRef", chat.imageUrl);
+            StorageReference ref;
+            try {
+                ref = FirebaseStorage.getInstance().getReferenceFromUrl(chat.imageUrl);
+                Glide.with(activity)
+                        .using(new FirebaseImageLoader())
+                        .load(ref)
+                        .asBitmap()
+                        .into(image);
+            } catch (Exception e) {
+                Log.v("StorageRef", "StorageRef is invalid, skipping image loading.");
+            }
             if (chat.text != null && chat.text.length() > 0) {
                 RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) text.getLayoutParams();
                 layoutParams.removeRule(RelativeLayout.BELOW);
