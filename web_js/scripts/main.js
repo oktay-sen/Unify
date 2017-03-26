@@ -21,6 +21,7 @@ function FriendlyChat() {
 
   // Shortcuts to DOM Elements.
   this.messageList = document.getElementById('messages');
+  this.projectList = document.getElementById('projects');
   this.messageForm = document.getElementById('message-form');
   this.messageInput = document.getElementById('message');
   this.submitButton = document.getElementById('submit');
@@ -43,6 +44,8 @@ function FriendlyChat() {
   this.messageInput.addEventListener('keyup', buttonTogglingHandler);
   this.messageInput.addEventListener('change', buttonTogglingHandler);
 
+  this.recreateAddProjectButton();
+
   // Events for image upload.
   this.submitImageButton.addEventListener('click', function(e) {
     e.preventDefault();
@@ -51,6 +54,7 @@ function FriendlyChat() {
   this.mediaCapture.addEventListener('change', this.saveImageMessage.bind(this));
 
   this.initFirebase();
+  console.log(this);
 }
 
 // Sets up shortcuts to Firebase features and initiate firebase auth.
@@ -64,9 +68,11 @@ FriendlyChat.prototype.initFirebase = function() {
 };
 
 // Loads chat messages history and listens for upcoming ones.
-FriendlyChat.prototype.loadMessages = function() {
+FriendlyChat.prototype.loadMessages = function(projectId) {
+  this.currentProject = projectId;
+  this.messageList.innerHTML = '';
   // Reference to the /messages/ database path.
-  this.messagesRef = this.database.ref('messages');
+  this.messagesRef = this.database.ref('messages/' + projectId);
   // Make sure we remove all previous listeners.
   this.messagesRef.off();
 
@@ -78,19 +84,77 @@ FriendlyChat.prototype.loadMessages = function() {
   this.messagesRef.on('child_changed', setMessage);
 };
 
+FriendlyChat.prototype.loadProjects = function() {
+  // Reference to the /messages/ database path.
+  this.projectsRef = this.database.ref('projects');
+  // Make sure we remove all previous listeners.
+  this.projectsRef.off();
+
+  var setProject = function(data) {
+    var val = data.val();
+    this.displayProject(data.key, val.title, val.description, val.imageUrl);
+  }.bind(this);
+  this.projectsRef.on('child_added', setProject);
+  this.projectsRef.on('child_changed', setProject);
+};
 // Saves a new message on the Firebase DB.
 FriendlyChat.prototype.saveMessage = function(e) {
   e.preventDefault();
   // Check that the user entered a message and is signed in.
-  if (this.messageInput.value && this.checkSignedInWithMessage()) {
+  if (this.currentProject && this.checkSignedIn()) {
     var currentUser = this.auth.currentUser;
     // Add a new message entry to the Firebase Database.
-    this.messagesRef.push({
+    this.database.ref('/messages/' + this.currentProject).push({
 	   uid: currentUser.uid,
       name: currentUser.displayName,
       text: this.messageInput.value,
       photoUrl: currentUser.photoURL || '/images/profile_placeholder.png'
     }).then(function() {
+      // Clear message text field and SEND button state.
+      FriendlyChat.resetMaterialTextfield(this.messageInput);
+      this.toggleButton();
+    }.bind(this)).catch(function(error) {
+      console.error('Error writing new message to Firebase Database', error);
+    });
+  }
+};
+
+// Returns true if user is signed-in. Otherwise false and displays a message.
+FriendlyChat.prototype.checkSignedIn = function() {
+  // Return true if the user is signed in Firebase
+  if (this.auth.currentUser) {
+    return true;
+  }
+
+  // Display a message to the user using a Toast.
+  var data = {
+    message: 'You must sign-in first',
+    timeout: 2000
+  };
+  this.signInSnackbar.MaterialSnackbar.showSnackbar(data);
+  return false;
+};
+// Saves a new message on the Firebase DB.
+FriendlyChat.prototype.saveProject = function() {
+  console.log(this);
+  // Check that the user entered a message and is signed in.
+  if (this.checkSignedIn) {
+    var currentUser = this.auth.currentUser;
+    // Add a new message entry to the Firebase Database.
+    var key = this.projectsRef.push().key;
+    var updates = {};
+    var members = {};
+    members[currentUser.uid] = true;
+    updates["/projects/" + key + "/"] = {
+	   title: "New Project",
+      description: "This is a cool project!",
+      members: members,
+      photoUrl: currentUser.photoURL || '/images/profile_placeholder.png'
+    };
+    updates["/users/" + currentUser.uid + "/projects/" + key + "/"] = true;
+
+
+    firebase.database().ref().update(updates).then(function() {
       // Clear message text field and SEND button state.
       FriendlyChat.resetMaterialTextfield(this.messageInput);
       this.toggleButton();
@@ -133,7 +197,7 @@ FriendlyChat.prototype.saveImageMessage = function(event) {
   }
 
   // Check if the user is signed-in
-  if (this.checkSignedInWithMessage()) {
+  if (this.checkSignedIn()) {
 
     // We add a message with a loading icon that will get updated with the shared image.
     var currentUser = this.auth.currentUser;
@@ -191,7 +255,8 @@ FriendlyChat.prototype.onAuthStateChanged = function(user) {
     this.signInButton.setAttribute('hidden', 'true');
 
     // We load currently existing chant messages.
-    this.loadMessages();
+    //this.loadMessages();
+    this.loadProjects();
 
     // We save the Firebase Messaging Device token and enable notifications.
     this.saveMessagingDeviceToken();
@@ -206,21 +271,7 @@ FriendlyChat.prototype.onAuthStateChanged = function(user) {
   }
 };
 
-// Returns true if user is signed-in. Otherwise false and displays a message.
-FriendlyChat.prototype.checkSignedInWithMessage = function() {
-  // Return true if the user is signed in Firebase
-  if (this.auth.currentUser) {
-    return true;
-  }
 
-  // Display a message to the user using a Toast.
-  var data = {
-    message: 'You must sign-in first',
-    timeout: 2000
-  };
-  this.signInSnackbar.MaterialSnackbar.showSnackbar(data);
-  return false;
-};
 
 // Saves the messaging device token to the datastore.
 FriendlyChat.prototype.saveMessagingDeviceToken = function() {
@@ -264,18 +315,24 @@ FriendlyChat.MESSAGE_TEMPLATE =
       '<div class="name"></div>' +
     '</div>';
 
+FriendlyChat.PROJECT_TEMPLATE =
+    '<a title="Project1" href="#" class="project-url mdl-card mdl-shadow--2dp mdl-cell mdl-cell--1-col"><img src="images/logo.png" width=66></a>';
+
+FriendlyChat.ADD_PROJECT_TEMPLATE =
+    '<a href="#" id="addProject" class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--1-col"><img src="images/add.png" width=66></a>';
+
 // A loading image URL.
 FriendlyChat.LOADING_IMAGE_URL = 'https://www.google.com/images/spin-32.gif';
 
 // Displays a Message in the UI.
 FriendlyChat.prototype.displayMessage = function(key, name, text, picUrl, imageUri) {
-  var div = document.getElementById(key);
+  var div = document.getElementById("message-" + key);
   // If an element for that message does not exists yet we create it.
   if (!div) {
     var container = document.createElement('div');
     container.innerHTML = FriendlyChat.MESSAGE_TEMPLATE;
     div = container.firstChild;
-    div.setAttribute('id', key);
+    div.setAttribute('id', "message-" + key);
     this.messageList.appendChild(div);
   }
   if (picUrl) {
@@ -301,6 +358,70 @@ FriendlyChat.prototype.displayMessage = function(key, name, text, picUrl, imageU
   this.messageList.scrollTop = this.messageList.scrollHeight;
   this.messageInput.focus();
 };
+
+// Displays a Message in the UI.
+FriendlyChat.prototype.displayProject = function(key, title, description, imageUrl) {
+  var div = document.getElementById("project-" + key);
+  // If an element for that message does not exists yet we create it.
+  var container;
+  if (!div) {
+    var container = document.createElement('div');
+    container.innerHTML = FriendlyChat.PROJECT_TEMPLATE;
+    div = container.firstChild;
+    div.setAttribute('id', "project-" + key);
+    this.projectList.appendChild(div);
+  } else {
+    container = div.parentNode;
+  }
+  this.recreateAddProjectButton();
+
+  if (imageUrl) {
+    div.getElementsByTagName('img')[0].src = imageUrl;
+  }
+  div.title = title;
+  div.href = "#";
+  div.onclick = () => this.loadMessages(key);
+
+  // div.querySelector('.name').textContent = name;
+  // var messageElement = div.querySelector('.message');
+  // if (text) { // If the message is text.
+  //   messageElement.textContent = text;
+  //   // Replace all line breaks by <br>.
+  //   messageElement.innerHTML = messageElement.innerHTML.replace(/\n/g, '<br>');
+  // } else if (imageUri) { // If the message is an image.
+  //   var image = document.createElement('img');
+  //   image.addEventListener('load', function() {
+  //     this.messageList.scrollTop = this.messageList.scrollHeight;
+  //   }.bind(this));
+  //   this.setImageUrl(imageUri, image);
+  //   messageElement.innerHTML = '';
+  //   messageElement.appendChild(image);
+  // }
+  // Show the card fading-in and scroll to view the new message.
+  setTimeout(function() {div.classList.add('visible')}, 1);
+  this.messageList.scrollTop = this.messageList.scrollHeight;
+  this.messageInput.focus();
+};
+
+FriendlyChat.prototype.recreateAddProjectButton = function() {
+  var addButton = document.getElementById("addProject");
+  if (addButton) {
+    addButton.outerHTML = '';
+  }
+
+  //'<a href="#" id="addProject" class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--1-col"><img src="images/add.png" width="66"/></a>'
+
+  // var addButtonContainer = document.createElement('div');
+  // addButtonContainer.innerHTML = this.ADD_PROJECT_TEMPLATE;
+  //addButton = addButtonContainer.firstChild;
+  addButton = document.createElement('a');
+  addButton.href="#";
+  addButton.className = "mdl-card mdl-shadow--2dp mdl-cell mdl-cell--1-col";
+  addButton.id = "addProject";
+  addButton.onclick = () => this.saveProject();
+  addButton.innerHTML = '<img src="images/add.png" width="66"/>';
+  this.projectList.appendChild(addButton);
+}
 
 // Enables or disables the submit button depending on the values of the input
 // fields.
