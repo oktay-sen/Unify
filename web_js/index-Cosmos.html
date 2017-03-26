@@ -1,11 +1,23 @@
 <!doctype html>
+<!--
+  Copyright 2015 Google Inc. All rights reserved.
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+      https://www.apache.org/licenses/LICENSE-2.0
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License
+-->
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="description" content="Learn how to use the Firebase platform on the Web">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Unify WebApp</title>
-  <link rel="icon" href="images/logoPlain.png">
+  <title>Friendly Chat</title>
 
   <!-- Disable tap highlight on IE -->
   <meta name="msapplication-tap-highlight" content="no">
@@ -15,7 +27,7 @@
 
   <!-- Add to homescreen for Chrome on Android -->
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="application-name" content="Unify WebApp">
+  <meta name="application-name" content="Friendly Chat">
   <meta name="theme-color" content="#303F9F">
 
   <!-- Add to homescreen for Safari on iOS -->
@@ -44,13 +56,8 @@
   <header class="mdl-layout__header mdl-color-text--white mdl-color--light-blue-700">
     <div class="mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-grid">
       <div class="mdl-layout__header-row mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-cell--12-col-desktop">
-        <img src="images/logoPlain.png" width=48>
-		<img src="images/logoText.png" width=128>
-		<a title="Project1" href="https://google.co.uk/" class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--1-col"><img src="images/logo.png" width=66></a>
-		<a href="https://google.co.uk/" class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--1-col"><img src="images/logo.png" width=66></a>
-		<a href="https://google.co.uk/" class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--1-col"><img src="images/add.png" width=66></a>
+        <h3><i class="material-icons">chat_bubble_outline</i> Friendly Chat</h3>
       </div>
-	  
       <div id="user-container">
         <div hidden id="user-pic"></div>
         <div hidden id="user-name"></div>
@@ -65,7 +72,7 @@
   </header>
 
   <main class="mdl-layout__content mdl-color--grey-100">
-	<div id="messages-card-container" class="mdl-grid">
+    <div id="messages-card-container" class="mdl-cell mdl-cell--12-col mdl-grid">
 
       <!-- Messages container -->
       <div id="messages-card" class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--12-col mdl-cell--6-col-tablet mdl-cell--6-col-desktop">
@@ -90,33 +97,18 @@
           </form>
         </div>
       </div>
-
-      <!-- Info container -->
-      <div id="messages-card" class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--12-col mdl-cell--6-col-tablet mdl-cell--6-col-desktop">
+	  
+	  <div id="projects-card" class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--4-col mdl-cell--2-col-tablet mdl-cell--2-col-desktop">
         <div class="mdl-card__supporting-text mdl-color-text--grey-600">
-		
         </div>
       </div>
-	  
-<!--  <div class="mdl-grid mdl-cell mdl-cell--12-col mdl-cell--6-col-tablet mdl-cell--6-col-desktop">
-		<div class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--4-col">
-			<img src="images/logoPlain.png" width=90 style="margin: auto; margin-top: 10px;">
-			<p align="center" style="margin-top: 5px;">Project Number 1</p>
-		</div>
-		<div class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--4-col">
-			<img src="images/logo.png" width=90 style="margin: auto; margin-top: 10px;">
-			<p align="center" style="margin-top: 5px;">Project Number 2</p>
-		</div>
-		<div class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--4-col">
-			<img src="images/add.png" style="margin: auto; margin-top: 25px;">
-		</div>
-      </div> -->
-	  
+
       <div id="must-signin-snackbar" class="mdl-js-snackbar mdl-snackbar">
         <div class="mdl-snackbar__text"></div>
         <button class="mdl-snackbar__action" type="button"></button>
       </div>
-	</div>
+
+    </div>
   </main>
 </div>
 

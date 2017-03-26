@@ -1,0 +1,27 @@
+Init js
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+# On branch master
+# Your branch is up-to-date with 'origin/master'.
+#
+# Changes to be committed:
+#	new file:   web_js/README.md
+#	new file:   web_js/chat.html
+#	new file:   web_js/database-rules.json
+#	new file:   web_js/firebase-messaging-sw.js
+#	new file:   web_js/firebase.json
+#	new file:   web_js/functions/index.js
+#	new file:   web_js/functions/package.json
+#	new file:   web_js/images/add.png
+#	new file:   web_js/images/firebase-logo.png
+#	new file:   web_js/images/logo.png
+#	new file:   web_js/images/logoPlain.png
+#	new file:   web_js/images/logoText.png
+#	new file:   web_js/images/profile_placeholder.png
+#	new file:   web_js/index.html
+#	new file:   web_js/manifest.json
+#	new file:   web_js/manifest.webapp
+#	new file:   web_js/scripts/main.js
+#	new file:   web_js/storage.rules
+#	new file:   web_js/styles/main.css
+#
